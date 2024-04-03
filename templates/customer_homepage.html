@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etsy</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style>
+
+        .category-image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .category-caption {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .category-section {
+            margin-top: 40px;
+        }
+
+        .footer {
+            background-color: #343a40;
+            color: #ffffff;
+            padding: 30px 0;
+        }
+
+        .footer-links {
+            text-align: center;
+        }
+
+        .footer-links a {
+            color: #ffffff;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand">Etsy</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="">My Purchases</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="">Loyalty Points</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="">Offers</a>
+                    </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="">Notifications</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i> Cart</a>
+                    </li>
+
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4 category-caption">
+        <h1>Welcome to Etsy, {{ user.firstname }} {{ user.lastname }}</h1>
+        <p>The Home of Affordable Products</p>
+    </div>
+
+    <!-- Shop by Category Section -->
+    <div class="container category-section">
+
+        <h2 class="text-center mb-4">Shop by Category</h2>
+            <div class="row">
+
+            <div class="col-md-3">
+                <img src="{{ url_for('static', filename='images/jewellery.png') }}" alt="Category 1" class="category-image">
+                <p class="category-caption">Jewellery</p>
+            </div>
+            <div class="col-md-3">
+                <img src="{{ url_for('static', filename='images/clothing.png') }}" alt="Category 2" class="category-image">
+                <p class="category-caption">Clothing</p>
+            </div>
+            <div class="col-md-3">
+                <img src="{{ url_for('static', filename='images/households.png') }}" alt="Category 3" class="category-image">
+                <p class="category-caption">Households</p>
+            </div>
+            <div class="col-md-3">
+                <img src="{{ url_for('static', filename='images/electronics.png') }}" alt="Category 4" class="category-image">
+                <p class="category-caption">Electronics</p>
+            </div>
+            <div class="col-md-3">
+                <img src="{{ url_for('static', filename='images/groceries.png') }}" alt="Category 1" class="category-image">
+                <p class="category-caption">Groceries</p>
+            </div>
+            <div class="col-md-3">
+                <img src="{{ url_for('static', filename='images/arts.png') }}" alt="Category 2" class="category-image">
+                <p class="category-caption">Arts & Collectibles</p>
+            </div>
+            <div class="col-md-3">
+                <img src="{{ url_for('static', filename='images/cars.png') }}" alt="Category 3" class="category-image">
+                <p class="category-caption">Motor Vehicles</p>
+            </div>
+            <div class="col-md-3">
+                <img src="{{ url_for('static', filename='images/accessories.png') }}" alt="Category 4" class="category-image">
+                <p class="category-caption">Accessories</p>
+            </div>
+            <!-- Add more categories here -->
+        </div>
+                 </div>
+
+
+
+
+
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Terms and Conditions</a>
+                <a href="#">Policies</a>
+                <a href="#">Careers</a>
+                <a href="#">Forums</a>
+                <a href="#">Sell on Etsy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

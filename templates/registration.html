@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etsy - Register</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+
+        .registration-form {
+            margin-top: 50px;
+        }
+          .category-caption {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+
+        .footer {
+            background-color: #343a40;
+            color: #ffffff;
+            padding: 30px 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .footer-links {
+            text-align: center;
+        }
+
+        .footer-links a {
+            color: #ffffff;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Etsy</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="register">Register</a>
+                    </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="">Sell On Etsy</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4 category-caption">
+        <h1>Welcome to Etsy</h1>
+        <p>The Home of Affordable Products</p>
+    </div>
+
+    <!-- Registration Form -->
+      <div class="row">
+
+    <div class="container registration-form">
+        <h2 class="text-center mb-4">Customer Registration</h2>
+        <div class="msg alert-danger">{{ msg }}</div>
+        <form action="{{ url_for('register') }}" method="POST">
+            <div class="form-group">
+                <label for="firstname">First Name</label>
+                <input type="text" class="form-control" id="firstname" name="firstname" value="{{ request.form.get('firstname', '') }}" required>
+            </div>
+            <div class="form-group">
+                <label for="lastname">Last Name</label>
+                <input type="text" class="form-control" id="lastname" name="lastname" value="{{ request.form.get('lastname', '') }}" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ request.form.get('email', '') }}" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" value="{{ request.form.get('password', '') }}" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" value="{{ request.form.get('confirm_password', '') }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Register</button>
+            <br /><br />
+        </form>
+         </div>
+
+    </div>
+
+
+    <!-- Footer -->
+     <div class = "row">
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Terms and Conditions</a>
+                <a href="#">Policies</a>
+                <a href="#">Careers</a>
+                <a href="#">Forums</a>
+                <a href="#">Sell on Etsy</a>
+            </div>
+        </div>
+    </footer>
+     </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
