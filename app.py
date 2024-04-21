@@ -1,5 +1,5 @@
 import MySQLdb
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, render_template_string, Response
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mysqldb import MySQL
 from flask_bcrypt import Bcrypt
@@ -192,7 +192,8 @@ def manage_products():
 
         if admin:
             # Pass user details to the template
-            return render_template('admin/manage_products.html', admin=admin)
+            products = admin_get_products()
+            return render_template('admin/manage_products.html', admin=admin, products=products)
         else:
             # User not found, redirect to login
             return redirect(url_for('admin_login'))
@@ -214,6 +215,8 @@ def add_products():
 
         if admin:
             # Pass user details to the template
+
+
             return render_template('admin/add_products.html', admin=admin)
         else:
             # User not found, redirect to login
@@ -253,15 +256,30 @@ def submit_product():
                 cur.close()
 
                 # Product addition successful
-                msg = "Product added successfully"
+                # Return JavaScript code to display a message
+                js_code = "alert('Product added successfully. Add another.');"
+                return Response(js_code, mimetype='text/javascript')
             else:
                 msg = "Adding product failed"
             # Redirect to the manage products page or any other desired page
         return redirect(url_for('add_products',  msg=msg))
     return render_template('admin/add_products.html', msg=msg)
 
-# Function to fetch products based on category
+# Method to fetch products from the database
+def admin_get_products():
+    # Connect to the database
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
+    # Fetch products from the 'products' table
+    cur.execute("SELECT * FROM products")
+    products = cur.fetchall()
+
+    cur.close()
+
+    return products
+
+
+# Function to fetch products based on category
 
 def get_products_by_category(category):
     try:
@@ -280,6 +298,59 @@ def products(category):
     products = get_products_by_category(category)
     return render_template('products.html', products=products)
 
+@app.route('/customer_products/<category>')
+def customer_products(category):
+    if 'user_id' in session:
+        # Fetch user details from the database using the session ID
+        user_id = session['user_id']
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("SELECT firstname, lastname FROM customers WHERE id = %s", (user_id,))
+        user = cur.fetchone()
+        cur.close()
+
+        if user:
+            # Pass user details to the template
+            products = get_products_by_category(category)
+            return render_template('customer_products.html', products=products, user=user)
+        else:
+            # User not found, redirect to login
+            return redirect(url_for('login'))
+    else:
+        # User not logged in, redirect to login
+        return redirect(url_for('login'))
+        # Fetch products based on category
+
+def get_single_product(id):
+    try:
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("SELECT * FROM products WHERE id = %s", (id,))
+        product = cur.fetchone()
+        return product
+
+    except mysql.connector.Error as err:
+        print("Error:", err)
+        return []
+@app.route('/single_product/<id>')
+def display_single_product (id):
+    if 'user_id' in session:
+        # Fetch user details from the database using the session ID
+        user_id = session['user_id']
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("SELECT firstname, lastname FROM customers WHERE id = %s", (user_id,))
+        user = cur.fetchone()
+        cur.close()
+
+        if user:
+            # Pass user details to the template
+            products = get_single_product(id)
+            return render_template('single_product.html', products=products, user=user)
+        else:
+            # User not found, redirect to login
+            return redirect(url_for('login'))
+    else:
+        # User not logged in, redirect to login
+        return redirect(url_for('login'))
+        # Fetch products based on category
 
 @app.route('/admin_logout')
 def admin_logout():

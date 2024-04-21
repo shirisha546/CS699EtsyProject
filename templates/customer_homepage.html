@@ -48,7 +48,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand">Etsy</a>
+            <a class="navbar-brand" href="{{ url_for('customer_homepage') }}">Etsy</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -84,7 +84,7 @@
         <p>The Home of Affordable Products</p>
     </div>
 
-    <!-- Shop by Category Section -->
+   <!-- Shop by Category Section -->
     <div class="container category-section">
 
         <h2 class="text-center mb-4">Shop by Category</h2>
@@ -92,39 +92,39 @@
 
             <div class="col-md-3">
                 <img src="{{ url_for('static', filename='images/jewellery.png') }}" alt="Category 1" class="category-image">
-                <p class="category-caption">Jewellery</p>
+                <p class="category-caption"><a href="/customer_products/jewellery"> Jewellery </a></p>
             </div>
             <div class="col-md-3">
                 <img src="{{ url_for('static', filename='images/clothing.png') }}" alt="Category 2" class="category-image">
-                <p class="category-caption">Clothing</p>
+                <p class="category-caption"><a href="/customer_products/clothes"> Clothing </a></p>
             </div>
             <div class="col-md-3">
                 <img src="{{ url_for('static', filename='images/households.png') }}" alt="Category 3" class="category-image">
-                <p class="category-caption">Households</p>
+                <p class="category-caption"><a href="/customer_products/households"> Households</a></p>
             </div>
             <div class="col-md-3">
                 <img src="{{ url_for('static', filename='images/electronics.png') }}" alt="Category 4" class="category-image">
-                <p class="category-caption">Electronics</p>
+                <p class="category-caption"><a href="/customer_products/electronics"> Electronics</a> </p>
             </div>
             <div class="col-md-3">
                 <img src="{{ url_for('static', filename='images/groceries.png') }}" alt="Category 1" class="category-image">
-                <p class="category-caption">Groceries</p>
+                <p class="category-caption"><a href="/customer_products/groceries"> Groceries </a></p>
             </div>
             <div class="col-md-3">
                 <img src="{{ url_for('static', filename='images/arts.png') }}" alt="Category 2" class="category-image">
-                <p class="category-caption">Arts & Collectibles</p>
+                <p class="category-caption"><a href="/customer_products/arts_and_collections"> Arts & Collectibles </a> </p>
             </div>
             <div class="col-md-3">
                 <img src="{{ url_for('static', filename='images/cars.png') }}" alt="Category 3" class="category-image">
-                <p class="category-caption">Motor Vehicles</p>
+                <p class="category-caption"> <a href="/customer_products/cars"> Motor Vehicles </a></p>
             </div>
             <div class="col-md-3">
                 <img src="{{ url_for('static', filename='images/accessories.png') }}" alt="Category 4" class="category-image">
-                <p class="category-caption">Accessories</p>
+                <p class="category-caption"><a href="/customer_products/accessories"> Accessories </a></p>
             </div>
             <!-- Add more categories here -->
         </div>
-                 </div>
+    </div>
 
 
 
