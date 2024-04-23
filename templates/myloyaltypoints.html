@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Loyalty Points</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('customer_homepage') }}">Etsy</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('customer_homepage') }}">All Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('customer_purchases') }}">My Purchases</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('view_loyalty_points') }}">Loyalty Points</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('customer_offers') }}">Offers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('view_notifications') }}">Notifications</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('cart') }}"><i class="fas fa-shopping-cart"></i> Cart</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h4 style="text-align:center">Hi. {{ user.firstname }} {{ user.lastname }}</h4> <br /><br />
+     <h5>Active Loyalty Points: {{ total_points }} </h5><br />
+
+    <h5>Points Equivalent To: ${{ total_points / 5}} </h5><br />
+    <h5>Points Earned All Time: {{ alltime_points }} </h5><br />
+    <h5>Loyalty Level: Level {{ loyalty_level }} </h5><br />
+    <p>NB: Choose "Redeem Points" option during checkout to pay for a product. </p><br />
+
+
+    <div class="mt-4">
+        <h5>Loyalty Points Earned Over Time</h5>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Points Earned</th>
+                    <th>Date Earned</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for point in every_alltimepoints %}
+                <tr>
+                    <td>{{ point.points_earned }}</td>
+                    <td>{{ point.date_earned }}</td>
+                    <td>{{ point.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+     <div>
+        <h5>How Loyalty Points are Earned:</h5>
+        <p>Customers earn 10 loyalty points for every purchase exceeding $500. You can redeem the loyalty points to make purchases.
+        Every 10 loyalty points are equivalent to $5. To determine the loyalty level, we assess the customer's all-time
+            points. If their accumulated points fall below 100, they're categorized as Level 0.
+            Advancing to Level 1 requires accumulating between 100 and 199 points,
+            while Level 2 is attained with points ranging from 200 to 249.
+            Beyond this, exceeding 250 points elevates the customer to the prestigious status of
+            "Gold Customer". Adjustments to these thresholds or labels can be made to better align with
+            specific program goals and customer incentives.</p>
+        <!-- You can add more information about loyalty points here -->
+    </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Your JavaScript code here -->
+
+</body>
+</html>

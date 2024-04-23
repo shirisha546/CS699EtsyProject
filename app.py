@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mysqldb import MySQL
 from flask_bcrypt import Bcrypt
 import os
+import logging
 from passlib.hash import bcrypt_sha256
 
 app = Flask(__name__)
@@ -120,12 +121,14 @@ def customer_homepage():
         # User not logged in, redirect to login
         return redirect(url_for('login'))
 
+
 @app.route('/logout')
 def logout():
     # Clear the session
     session.pop('user_id', None)
     session.pop('email', None)
     return redirect(url_for('login'))
+
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -154,6 +157,7 @@ def admin_login():
 
     return render_template('admin/admin_login.html', msg=msg)
 
+
 @app.route('/admin/dashboard')
 def admin_dashboard():
     msg = ''
@@ -176,6 +180,7 @@ def admin_dashboard():
     else:
         # User not logged in, redirect to login
         return redirect(url_for('admin_login'))
+
 
 @app.route('/admin/manage_products')
 def manage_products():
@@ -200,6 +205,31 @@ def manage_products():
     else:
         # User not logged in, redirect to login
         return redirect(url_for('admin_login'))
+@app.route('/admin/manage_offers')
+def manage_offers():
+    msg = ''
+    # Check if admin is logged in
+    if 'admin_id' in session:
+
+        # Fetch user details from the database using the session ID
+        admin_id = session['admin_id']
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("SELECT firstname, lastname FROM admins WHERE admin_id = %s", (admin_id,))
+        admin = cur.fetchone()
+        cur.close()
+
+        if admin:
+            # Pass user details to the template
+            products = admin_get_offers()
+            return render_template('admin/manage_offers.html', admin=admin, products=products)
+        else:
+            # User not found, redirect to login
+            return redirect(url_for('admin_login'))
+    else:
+        # User not logged in, redirect to login
+        return redirect(url_for('admin_login'))
+
+
 @app.route('/admin/add_products')
 def add_products():
     msg = ''
@@ -216,7 +246,6 @@ def add_products():
         if admin:
             # Pass user details to the template
 
-
             return render_template('admin/add_products.html', admin=admin)
         else:
             # User not found, redirect to login
@@ -224,6 +253,7 @@ def add_products():
     else:
         # User not logged in, redirect to login
         return redirect(url_for('admin_login'))
+
 
 # Route for adding a product
 @app.route('/admin/submit_product', methods=['GET', 'POST'])
@@ -236,6 +266,7 @@ def submit_product():
         price = request.form['price']
         description = request.form['description']
         category = request.form['category']
+        type = request.form['type']
 
         image = request.files['image']
 
@@ -250,8 +281,9 @@ def submit_product():
 
                 # Insert product details into the database
                 cur = mysql.connection.cursor()
-                cur.execute("INSERT INTO products (name, price, description, category, image_path) VALUES (%s, %s, %s, %s, %s)",
-                            (name, price, description, category, image.filename))
+                cur.execute(
+                    "INSERT INTO products (name, price, description, category, image_path, type) VALUES (%s, %s, %s, %s, %s, %s)",
+                    (name, price, description, category, image.filename, type))
                 mysql.connection.commit()
                 cur.close()
 
@@ -262,8 +294,9 @@ def submit_product():
             else:
                 msg = "Adding product failed"
             # Redirect to the manage products page or any other desired page
-        return redirect(url_for('add_products',  msg=msg))
+        return redirect(url_for('add_products', msg=msg))
     return render_template('admin/add_products.html', msg=msg)
+
 
 # Method to fetch products from the database
 def admin_get_products():
@@ -271,7 +304,20 @@ def admin_get_products():
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
     # Fetch products from the 'products' table
-    cur.execute("SELECT * FROM products")
+    cur.execute("SELECT * FROM products WHERE type = 'sales'")
+    products = cur.fetchall()
+
+    cur.close()
+
+    return products
+
+#Method to Fetch Offers
+def admin_get_offers():
+    # Connect to the database
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    # Fetch products from the 'products' table
+    cur.execute("SELECT * FROM products WHERE type = 'offer'")
     products = cur.fetchall()
 
     cur.close()
@@ -292,11 +338,26 @@ def get_products_by_category(category):
         print("Error:", err)
         return []
 
+#Get products on offer
+
+def get_products_on_offer():
+    try:
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("SELECT * FROM products WHERE type = 'offer'")
+        products = cur.fetchall()
+        return products
+
+    except mysql.connector.Error as err:
+        print("Error:", err)
+        return []
+
+
 @app.route('/products/<category>')
 def products(category):
-        # Fetch products based on category
+    # Fetch products based on category
     products = get_products_by_category(category)
     return render_template('products.html', products=products)
+
 
 @app.route('/customer_products/<category>')
 def customer_products(category):
@@ -304,7 +365,7 @@ def customer_products(category):
         # Fetch user details from the database using the session ID
         user_id = session['user_id']
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur.execute("SELECT firstname, lastname FROM customers WHERE id = %s", (user_id,))
+        cur.execute("SELECT * FROM customers WHERE id = %s", (user_id,))
         user = cur.fetchone()
         cur.close()
 
@@ -320,6 +381,29 @@ def customer_products(category):
         return redirect(url_for('login'))
         # Fetch products based on category
 
+@app.route('/customer_offers')
+def customer_offers():
+    if 'user_id' in session:
+        # Fetch user details from the database using the session ID
+        user_id = session['user_id']
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("SELECT * FROM customers WHERE id = %s", (user_id,))
+        user = cur.fetchone()
+        cur.close()
+
+        if user:
+            # Pass user details to the template
+            products = get_products_on_offer()
+            return render_template('customer_offers.html', products=products, user=user)
+        else:
+            # User not found, redirect to login
+            return redirect(url_for('login'))
+    else:
+        # User not logged in, redirect to login
+        return redirect(url_for('login'))
+        # Fetch products based on category
+
+
 def get_single_product(id):
     try:
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -330,13 +414,15 @@ def get_single_product(id):
     except mysql.connector.Error as err:
         print("Error:", err)
         return []
+
+
 @app.route('/single_product/<id>')
-def display_single_product (id):
+def display_single_product(id):
     if 'user_id' in session:
         # Fetch user details from the database using the session ID
         user_id = session['user_id']
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cur.execute("SELECT firstname, lastname FROM customers WHERE id = %s", (user_id,))
+        cur.execute("SELECT * FROM customers WHERE id = %s", (user_id,))
         user = cur.fetchone()
         cur.close()
 
@@ -351,6 +437,272 @@ def display_single_product (id):
         # User not logged in, redirect to login
         return redirect(url_for('login'))
         # Fetch products based on category
+
+
+@app.route('/add_to_cart', methods=['GET', 'POST'])
+def add_to_cart():
+    if request.method == 'POST':
+        # Extract values from the request
+        customer_id = request.form.get('customer_id')
+        product_id = request.form.get('product_id')
+        quantity = request.form.get('quantity')
+        unit_price = request.form.get('unit_price')
+
+        # Log the received values
+        print("Received values:")
+        print("Customer ID:", customer_id)
+        print("Product ID:", product_id)
+        print("Quantity:", quantity)
+        print("Unit Price:", unit_price)
+
+        try:
+            # Your database insertion code here
+            cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cur.execute("""
+                INSERT INTO purchases (customerid, productid, quantity, unitprice, status)
+                VALUES (%s, %s, %s, %s, 'cart')
+            """, (customer_id, product_id, quantity, unit_price))
+            mysql.connection.commit()
+            cur.close()
+            return "Success"
+        except mysql.connector.Error as err:
+            print("Error:", err)
+            return "Error"
+    else:
+        return "Method Not Allowed"
+
+
+@app.route('/cart')
+def cart():
+    if 'user_id' in session:
+        # Fetch user details from the database using the session ID
+        user_id = session['user_id']
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("SELECT * FROM customers WHERE id = %s", (user_id,))
+        user = cur.fetchone()
+        cur.close()
+
+        if user:
+            # Pass user details to the template
+            cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cur.execute("""
+                        SELECT products.name, purchases.quantity, purchases.unitprice
+                        FROM purchases
+                        INNER JOIN products ON purchases.productid = products.id
+                        WHERE purchases.customerid = %s AND purchases.status = 'cart'
+                    """, (user_id,))
+            cart_items = cur.fetchall()
+            cur.close()
+            # Calculate total cost
+            total_cost = sum(item['quantity'] * item['unitprice'] for item in cart_items)
+
+            return render_template('cart.html', user=user, cart_items=cart_items, total_cost=total_cost)
+
+        else:
+            # User not found, redirect to login
+            return redirect(url_for('login'))
+    else:
+        # User not logged in, redirect to login
+        return redirect(url_for('login'))
+@app.route('/checkout')
+def checkout():
+    if 'user_id' in session:
+        # Fetch user details from the database using the session ID
+        user_id = session['user_id']
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("SELECT * FROM customers WHERE id = %s", (user_id,))
+        user = cur.fetchone()
+        cur.close()
+
+        if user:
+            # Pass user details to the template
+            cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cur.execute("""
+                        SELECT products.name, purchases.quantity, purchases.unitprice
+                        FROM purchases
+                        INNER JOIN products ON purchases.productid = products.id
+                        WHERE purchases.customerid = %s AND purchases.status = 'cart'
+                    """, (user_id,))
+            cart_items = cur.fetchall()
+            cur.close()
+            # Calculate total cost
+            total_cost = sum(item['quantity'] * item['unitprice'] for item in cart_items)
+
+            return render_template('checkout.html', user=user, cart_items=cart_items, total_cost=total_cost)
+
+        else:
+            # User not found, redirect to login
+            return redirect(url_for('login'))
+    else:
+        # User not logged in, redirect to login
+        return redirect(url_for('login'))
+
+from flask import request, jsonify
+
+@app.route('/complete_payment', methods=['POST'])
+def complete_payment():
+    if request.method == 'POST':
+        # Extract values from the request
+        customer_id = request.form.get('customer_id')
+        address = request.form.get('address')
+        payment_method = request.form.get('payment_method')
+        total_cost = float(request.form.get('total_cost'))
+
+        # Log the received values
+        print("Received values:")
+        print("Customer ID:", customer_id)
+        print("Address:", address)
+        print("Payment Method:", payment_method)
+
+        try:
+            # Update the purchases table to set purchase date, address, payment method, and status
+            cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cur.execute("""
+                UPDATE purchases
+                SET purchasedate = NOW(), shippingaddress = %s, paymentmethod = %s, status = 'paid'
+                WHERE customerid = %s AND status = 'cart'
+            """, (address, payment_method, customer_id))
+            mysql.connection.commit()
+            cur.close()
+
+            if total_cost >= 500:
+                try:
+                    # Your database insertion code here
+                    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+                    cur.execute("""
+                        INSERT INTO loyaltypoints (customerid, points_earned, date_earned)
+                        VALUES (%s,10, NOW())
+                    """, (customer_id,))
+                    mysql.connection.commit()
+                    cur.close()
+                    return "Success"
+                except mysql.connector.Error as err:
+                    print("Error:", err)
+                    return "Error"
+
+            else:
+                return "No points earned"
+            return jsonify({'message': 'Payment completed successfully!'})
+        except mysql.connector.Error as err:
+            print("Error:", err)
+            return jsonify({'error': 'Error completing payment'}), 500
+    else:
+        return "Method Not Allowed"
+
+@app.route('/customer_purchases')
+def customer_purchases():
+    if 'user_id' in session:
+        # Fetch user details from the database using the session ID
+        user_id = session['user_id']
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("SELECT * FROM customers WHERE id = %s", (user_id,))
+        user = cur.fetchone()
+        cur.close()
+
+        if user:
+            # Pass user details to the template
+            cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cur.execute("""
+                        SELECT products.name, purchases.quantity, purchases.unitprice, purchases.shippingaddress, purchases.paymentmethod,
+                        purchases.purchasedate, purchases.status
+                        FROM purchases
+                        INNER JOIN products ON purchases.productid = products.id
+                        WHERE purchases.customerid = %s AND purchases.status != 'cart'
+                    """, (user_id,))
+            purchases = cur.fetchall()
+            cur.close()
+
+
+            return render_template('customer_purchases.html', user=user, purchases=purchases)
+
+        else:
+            # User not found, redirect to login
+            return redirect(url_for('login'))
+    else:
+        # User not logged in, redirect to login
+        return redirect(url_for('login'))
+
+@app.route('/view_loyalty_points')
+def view_loyalty_points():
+    if 'user_id' in session:
+        # Fetch user details from the database using the session ID
+        user_id = session['user_id']
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("SELECT * FROM customers WHERE id = %s", (user_id,))
+        user = cur.fetchone()
+        cur.close()
+
+        if user:
+            # Pass user details to the template
+            cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cur.execute("""
+                        SELECT * FROM loyaltypoints WHERE customerid = %s AND status = 'active'
+                    """, (user_id,))
+            points = cur.fetchall()
+            cur.close()
+
+            total_points = sum(item['points_earned'] for item in points)
+
+            #All time points
+
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute("""
+                                    SELECT * FROM loyaltypoints WHERE customerid = %s
+                                """, (user_id,))
+            all_points = cursor.fetchall()
+            cursor.close()
+
+            every_alltimepoints = all_points
+
+            alltime_points = sum(item['points_earned'] for item in all_points)
+            loyalty_level = None
+            if alltime_points < 100:
+                loyalty_level = 0
+            elif 100 <= alltime_points < 200:
+                loyalty_level = 1
+            elif 200 <= alltime_points < 250:
+                loyalty_level = 2
+            else:
+                loyalty_level = "Gold Customer"  # You can adjust this label as needed
+
+
+            return render_template('myloyaltypoints.html', user=user, points = points,
+                                   total_points=total_points, alltime_points=alltime_points, loyalty_level=loyalty_level, every_alltimepoints = every_alltimepoints)
+
+        else:
+            # User not found, redirect to login
+            return redirect(url_for('login'))
+    else:
+        # User not logged in, redirect to login
+        return redirect(url_for('login'))
+
+@app.route('/view_notifications')
+def view_notifications():
+    if 'user_id' in session:
+        # Fetch user details from the database using the session ID
+        user_id = session['user_id']
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cur.execute("SELECT * FROM customers WHERE id = %s", (user_id,))
+        user = cur.fetchone()
+        cur.close()
+
+        if user:
+            # Pass user details to the template
+            cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cur.execute("""
+                        SELECT * FROM loyaltypoints WHERE customerid = %s AND display_status = 'new' ORDER BY date_earned DESC
+                    """, (user_id,))
+            points = cur.fetchall()
+            cur.close()
+
+            return render_template('view_notifications.html', user=user, points = points)
+
+        else:
+            # User not found, redirect to login
+            return redirect(url_for('login'))
+    else:
+        # User not logged in, redirect to login
+        return redirect(url_for('login'))
 
 @app.route('/admin_logout')
 def admin_logout():

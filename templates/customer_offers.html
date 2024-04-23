@@ -55,7 +55,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('customer_homepage') }}">All Products</a>
+                        <a class="nav-link" href="{{ url_for('customer_homepage') }}">All Products</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('customer_purchases') }}">My Purchases</a>
@@ -90,51 +90,26 @@
    <!-- Shop by Category Section -->
     <div class="container category-section">
 
-        <h2 class="text-center mb-4">Shop by Category</h2>
+        <h2 class="text-center mb-4">Choose An Offer </h2>
             <div class="row">
+                {% for product in products %}
+            <div class="col-md-3">
+               <div class="product-card">
+                    <img src="{{ url_for('static', filename='product_images/' + product.image_path) }}" class="card-img-top" alt="Product Image">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">Price: ${{ product.price }}</p>
+                        <a href="/single_product/{{ product.id }}" class="btn btn-primary">View Details</a>
 
-            <div class="col-md-3">
-                <img src="{{ url_for('static', filename='images/jewellery.png') }}" alt="Category 1" class="category-image">
-                <p class="category-caption"><a href="/customer_products/jewellery"> Jewellery </a></p>
+
+
+                    </div>
+                </div>
             </div>
-            <div class="col-md-3">
-                <img src="{{ url_for('static', filename='images/clothing.png') }}" alt="Category 2" class="category-image">
-                <p class="category-caption"><a href="/customer_products/clothes"> Clothing </a></p>
-            </div>
-            <div class="col-md-3">
-                <img src="{{ url_for('static', filename='images/households.png') }}" alt="Category 3" class="category-image">
-                <p class="category-caption"><a href="/customer_products/households"> Households</a></p>
-            </div>
-            <div class="col-md-3">
-                <img src="{{ url_for('static', filename='images/electronics.png') }}" alt="Category 4" class="category-image">
-                <p class="category-caption"><a href="/customer_products/electronics"> Electronics</a> </p>
-            </div>
-            <div class="col-md-3">
-                <img src="{{ url_for('static', filename='images/groceries.png') }}" alt="Category 1" class="category-image">
-                <p class="category-caption"><a href="/customer_products/groceries"> Groceries </a></p>
-            </div>
-            <div class="col-md-3">
-                <img src="{{ url_for('static', filename='images/arts.png') }}" alt="Category 2" class="category-image">
-                <p class="category-caption"><a href="/customer_products/arts_and_collections"> Arts & Collectibles </a> </p>
-            </div>
-            <div class="col-md-3">
-                <img src="{{ url_for('static', filename='images/cars.png') }}" alt="Category 3" class="category-image">
-                <p class="category-caption"> <a href="/customer_products/cars"> Motor Vehicles </a></p>
-            </div>
-            <div class="col-md-3">
-                <img src="{{ url_for('static', filename='images/accessories.png') }}" alt="Category 4" class="category-image">
-                <p class="category-caption"><a href="/customer_products/accessories"> Accessories </a></p>
-            </div>
-            <!-- Add more categories here -->
+                {% endfor %}
+
         </div>
     </div>
-
-
-
-
-
-
-
     <!-- Footer -->
     <footer class="footer">
         <div class="container">

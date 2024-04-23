@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('customer_homepage') }}">Etsy</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('customer_homepage') }}">All Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('customer_purchases') }}">My Purchases</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('view_loyalty_points') }}">Loyalty Points</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('customer_offers') }}">Offers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('view_notifications') }}">Notifications</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('cart') }}"><i class="fas fa-shopping-cart"></i> Cart</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h4>Welcome to Your Cart, {{ user.firstname }} {{ user.lastname }}</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Cost</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ item.unitprice }}</td>
+                <td>${{ item.quantity * item.unitprice }}</td> <!-- Calculate cost -->
+            </tr>
+            {% endfor %}
+        <tr>
+            <td colspan="3" class="text-right">Total Cost:${{ total_cost }}</td>
+
+        </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" class="text-right">
+                   <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-lg">Checkout</a>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Your JavaScript code here -->
+
+</body>
+</html>
